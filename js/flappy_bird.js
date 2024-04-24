@@ -23,15 +23,15 @@ let bird = {
     vx: 0,
     vy: 0
 };
-let gravity = 7
+let gravity = 4
 let velocity = 0
 
 
 document.addEventListener('keydown', function (e) {
-    if (e.code === "KeyD") bird.vx = 6;
-    if (e.code === "KeyA") bird.vx = -6;
-    if (e.code === "KeyW") bird.vy = -6;
-    if (e.code === "KeyS") bird.vy = 6;
+    if (e.code === "KeyD") bird.vx = 4;
+    if (e.code === "KeyA") bird.vx = -4;
+    if (e.code === "KeyW") bird.vy = -4;
+    if (e.code === "KeyS") bird.vy = 4;
 });
 
 
@@ -125,8 +125,6 @@ class CalculateDistanceFromPortal {
         const distY = Math.max(dy, 0);
 
         return Math.sqrt(distX * distX + distY * distY);
-
-
     }
 
 }
@@ -144,12 +142,11 @@ const update = () => {
         });
 
     }
+    updateBirdPosition(bird.x, bird.y);
+    bird.x += bird.vx;
+    bird.y += bird.vy;
 
 
-    bird.x += bird.vx
-    bird.y += bird.vy
-
-    updateBirdPosition(bird.x += bird.vx, bird.y += bird.vy)
     if (is_Around_Terrret) {
         last_known_Location.x.push(bird.x += bird.vx);
         last_known_Location.y.push(bird.y += bird.vy);
@@ -180,7 +177,7 @@ const update = () => {
 
 
     if (calculate1.calculateDistance() === 20 || calculate2.calculateDistance() === 20) {
-        console.log("Oops collided with a pole");
+        ("Oops collided with a pole");
         bird.x = 0;
         bird.y = 0;
     }
@@ -211,4 +208,5 @@ const update = () => {
 };
 
 update();
+
 
