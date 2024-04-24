@@ -1,4 +1,4 @@
-import { birdX, updateBirdPosition } from "./common/common.js";
+import { updateBirdPosition } from "./common/common.js";
 
 let canvas = document.getElementById("canvas");
 let ctx = canvas.getContext("2d");
