@@ -1,3 +1,5 @@
+import { birdX, updateBirdPosition } from "./common/common.js";
+
 let canvas = document.getElementById("canvas");
 let ctx = canvas.getContext("2d");
 let pipe1 = document.getElementById("pipe1");
@@ -6,8 +8,6 @@ let portal = document.getElementById("portal")
 let portal_exit = document.getElementById("portal_exit")
 let floor = document.getElementById("floor")
 let container = document.getElementById("container")
-
-
 
 
 let is_in_portal = false
@@ -23,6 +23,27 @@ let bird = {
     vx: 0,
     vy: 0
 };
+let gravity = 7
+let velocity = 0
+
+
+document.addEventListener('keydown', function (e) {
+    if (e.code === "KeyD") bird.vx = 6;
+    if (e.code === "KeyA") bird.vx = -6;
+    if (e.code === "KeyW") bird.vy = -6;
+    if (e.code === "KeyS") bird.vy = 6;
+});
+
+
+document.addEventListener('keyup', function (e) {
+
+
+    if (e.code === "KeyD") bird.vx = velocity;
+    if (e.code === "KeyA") bird.vx = velocity;
+    if (e.code === "KeyW" || e.code === "KeyS") bird.vy = gravity;
+});
+
+
 //!!Pipe_1
 let rectX = pipe1.offsetLeft;
 let rectY = pipe1.offsetTop;
@@ -55,7 +76,7 @@ let is_not_touching = false;
 
 let is_Around_Terrret = false
 
-class CalculateDistanceFromRectangles {
+export class CalculateDistanceFromRectangles {
     constructor(birdX, birdY, rectX, rectY, rectWidth, rectHeight) {
         this.pointX = birdX + bird.width / 2;
         this.pointY = birdY + bird.height / 2;
@@ -124,9 +145,11 @@ const update = () => {
 
     }
 
+
     bird.x += bird.vx
     bird.y += bird.vy
 
+    updateBirdPosition(bird.x += bird.vx, bird.y += bird.vy)
     if (is_Around_Terrret) {
         last_known_Location.x.push(bird.x += bird.vx);
         last_known_Location.y.push(bird.y += bird.vy);
@@ -153,7 +176,6 @@ const update = () => {
     let portal_distance = new CalculateDistanceFromPortal(bird.x, bird.y, rect_PortalX, rect_PortalY, rect_portal_width, rect_portal_hieght);
     let portal_exit_distance = new CalculateDistanceFromPortal(bird.x, bird.y, rect_Portal_ExitX, rect_Portal_ExitY, rect_portal_exit_width, rect_portal_exit_height);
     let floor_distance_from_player = new CalculateDistanceFromRectangles(bird.x, bird.y, rect_floor_x, rect_floor_y, rect_floor_width, rect_floor_hight);
-    let distance_from_ememy = new CalculateDistanceFromRectangles(bird.x, bird.y, rect_enemy_x, rect_enemy_y, rect_enemy_width, rect_enemy_height);
 
 
 
