@@ -1,0 +1,61 @@
+.overlay {
+    position: absolute;
+    top: 0px;
+    left: 50px;
+    width: 50px;
+    height: 400px;
+    background-color: rgba(255, 0, 0, 0.5);
+    border: 1px solid red;
+}
+
+.portal {
+    position: absolute;
+    top: 0px;
+    border-radius: 50%;
+    width: 100px;
+    /* Adjust the width and height as needed */
+    height: 100px;
+    /* Adjust the width and height as needed */
+    background-color: #ccc;
+    /* Change the background color as desired */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 700px;
+}
+
+.floor {
+    width: 80%;
+    /* Set width to 80% of the screen */
+    height: 5px;
+    /* Set the thickness of the line */
+    background-color: white;
+    /* Set background color to white */
+    position: absolute;
+    /* Position the floor relative to its containing element */
+
+    left: 50%;
+    /* Move the left edge of the floor to the center of its containing element */
+    transform: translateX(-50%);
+    /* Adjust the position to center the floor horizontally */
+
+    bottom: 500px;
+    /* Position the floor 500px from the bottom */
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    /* This ensures the container takes up the full height of the viewport */
+}
+
+.enemy {
+    width: 0;
+    height: 0;
+    border-left: 50px solid transparent;
+    border-right: 50px solid transparent;
+    border-bottom: 100px solid red;
+    margin-bottom: 120%;
+}

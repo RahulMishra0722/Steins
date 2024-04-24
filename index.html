@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bouncing Dot</title>
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  <div id="container" style="background-color: black; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; overflow: auto; scroll-behavior: smooth;">
+    <canvas id="canvas" width="1800" height="900" style="background-color: black;"></canvas>
+    <div  id="pipe1"  class="overlay" style="margin-left:40%;">Div 1</div>
+    <div class="container">
+      <div id="enemy" class="enemy"></div>
+    </div>
+   
+   <div id="floor" class="floor"></div>
+    <div id="pipe2"  class="overlay" style="left: 300px; top: 600px; ">  </div>
+  
+    <div id="portal" class="portal" style="left:-10%; top:0%"><img style="height: 170px; width: 170px;"src="/js/portal.png" alt="Teleportation Portal"></div>
+    <div id="portal_exit" class="portal" style="left:200px; top:300px"><img style="height: 170px; width: 170px;" src="/js/portal.png" alt="Teleportation Portal"></div>
+  </div>
+  <script  type="module" src="js/flappy_bird.js"></script>
+  <script src="js/inputhandler.js"></script>
+  <script type="module" src="js/Terrret.js"></script>
+
+
+
+</body>
+</html>
