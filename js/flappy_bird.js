@@ -1,4 +1,4 @@
-import { updateBirdPosition } from "./common/common.js";
+import { updateBirdPosition } from "./common/TARRET.js";
 
 let canvas = document.getElementById("canvas");
 let ctx = canvas.getContext("2d");
@@ -134,14 +134,7 @@ const update = () => {
         bird.y = 0; // Resetting the bird's position
         return;
     }
-    function attack() {
-        let bullet = document.querySelectorAll(".bullet"); // Get all bullets
-        bullet.forEach((bullet) => {
-            bullet.style.top = bird.x + 10; // Set the top position to 200px
-            bullet.style.left = bird.y + 10; // Set the left position to 300px
-        });
 
-    }
     updateBirdPosition(bird.x, bird.y);
     bird.x += bird.vx;
     bird.y += bird.vy;
@@ -165,7 +158,7 @@ const update = () => {
 
     ctx.fillRect(bird.x, bird.y, 50, 50);
 
-    attack()
+
 
 
     let calculate1 = new CalculateDistanceFromRectangles(bird.x, bird.y, rectX, rectY, rectWidth, rectHeight);
