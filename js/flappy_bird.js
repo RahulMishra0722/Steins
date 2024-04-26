@@ -72,7 +72,7 @@ let rect_floor_x = rect_floor.left
 let rect_floor_y = rect_floor.top;
 let rect_floor_width = rect_floor.width
 let rect_floor_hight = rect_floor.height
-let is_not_touching = false;
+
 
 let is_Around_Terrret = false
 
@@ -130,10 +130,7 @@ class CalculateDistanceFromPortal {
 }
 const update = () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if (bird.y + 50 >= canvas.height) {
-        bird.y = 0; // Resetting the bird's position
-        return;
-    }
+
 
     updateBirdPosition(bird.x, bird.y);
     bird.x += bird.vx;
