@@ -7,7 +7,17 @@ window.addEventListener('load', function () {
     const CANVAS_HEIGHT = canvas.height = 700;
     const player_image = player_image1
     let lastTime = 0
+    let game_over = false
     let enemies = []
+    let shop_ani = shop_animation
+
+    let val = 0
+    let distanceTraveled = 0;
+    console.log(distanceTraveled)
+    let layer_4 = new Layer(shop_ani, 1, canvas.width, canvas.height)
+
+
+    let player_state = "";
 
     let input = new InputHandler()
     class Player {
@@ -24,10 +34,13 @@ window.addEventListener('load', function () {
             this.groundLevel = canvas.height - this.height;
             this.x = 0;
             this.y = gameHeight - this.height;
+            this.player_health = 100
+
             this.gravity = 10;
             this.vX = 0;
             this.maxFrame = 12;
             this.vY = 0
+
             this.Animation_States = [
                 {
                     name: "idle",
@@ -58,7 +71,7 @@ window.addEventListener('load', function () {
                     frames: 3
                 }
             ];
-            this.player_state = "roll";
+
             this.frame_segment_location();
         }
         frame_segment_location() {
@@ -73,12 +86,56 @@ window.addEventListener('load', function () {
             });
         }
 
-        update() {
-            if (input.isPlayerIdle()) {
-                this.player_state = "idle";
+        update(enemyArray) {
+
+            if (input.is_moving_backwords()) {
+                val--
+            } else {
+                if (input.isRunning() || input.ifForwardRollPressed()) {
+                    val++
+                }
             }
-            if (this.player_state && this.Animation_States.find(state => state.name === this.player_state)) {
-                let state = this.Animation_States.find(state => state.name === this.player_state);
+
+            layer_4.draw_shop(val)
+
+
+
+
+
+
+            //*Colition Detection
+            enemyArray.forEach(obj => {
+                let dx = obj.x - this.x
+                let dy = obj.y - this.y
+                let distance = Math.sqrt(dx * dx + dy * dy)
+                if (distance < obj.width / 2 + this.width / 2) {
+                    this.player_health -= 0.1
+                    if (this.player_health < 0) {
+                        input.dead()
+                        if (input.isDead()) {
+                            player_state = "dies"
+                        }
+                        this.player_health = 100
+                    }
+
+
+                } if (distance < obj.width / 2 + this.width / 2 && input.is_Attacking()) {
+                    obj.enemy_health -= 10
+
+
+                }
+                if (obj.enemy_health < 0) {
+                    obj.isMarkedForDeletion = true
+                }
+            })
+            //* Controls
+            if (input.isPlayerIdle()) {
+                player_state = "idle";
+            }
+
+
+            if (player_state && this.Animation_States.find(state => state.name === player_state)) {
+                let state = this.Animation_States.find(state => state.name === player_state);
 
                 let position = Math.floor(this.game_frame / this.maxFrame) % state.frames.length;
 
@@ -86,16 +143,18 @@ window.addEventListener('load', function () {
                 this.frame_y = state.frames[position].y;
             }
             if (input.isSittingDown()) {
-                this.player_state = 'sit'
+                player_state = 'sit'
             }
-
+            if (input.is_Attacking()) {
+                player_state = "attack"
+            }
 
             if (input.jump_in_position() && this.onGround()) {
                 this.vY -= 20
             }
             // Check if the player is currently rolling and limit the height
             if (input.ifForwardRollPressed() && this.onGround()) {
-                this.player_state = 'roll';
+                player_state = 'roll';
                 this.vX += 5
                 this.vY -= 20
             }
@@ -103,7 +162,7 @@ window.addEventListener('load', function () {
             if (!this.onGround()) {
                 this.vY += 1
                 this.vX += 10
-                this.player_state = "run_and_jumo_land"
+                player_state = "run_and_jumo_land"
             } else {
                 this.vY = 0
             }
@@ -118,12 +177,12 @@ window.addEventListener('load', function () {
             if (this.y > this.gameHeight - this.height) this.y = this.gameHeight - this.height
             if (input.isRunning("KeyD")) {
                 this.vX += 2
-                this.player_state = "run_and_jump";
+                player_state = "run_and_jump";
             } if (input.is_moving_backwords()) {
                 this.vX -= 10
             }
             if (input.wasHit()) {
-                this.player_state = "got_hit";
+                player_state = "got_hit";
             }
         }
         onGround() {
@@ -131,11 +190,25 @@ window.addEventListener('load', function () {
         }
 
 
+        show_Health() {
+            ctx.font = '30px Arial'
+            ctx.fillStyle = "black"
+            ctx.fillText('HP: ' + Math.floor(this.player_health), 50, 75)
+            ctx.fillStyle = "white"
+            ctx.fillText('HP: ' + Math.floor(this.player_health), 52, 78)
+        }
+
         draw(context) {
+
+            context.beginPath();
+            context.arc(this.x + this.width / 2, this.y + this.height / 2, this.width / 2, 0, Math.PI * 2);
+            context.strokeStyle = "transparent";
+            context.stroke();
             context.drawImage(player_image, this.frame_x, this.frame_y, this.SPRITE_WIDTH, this.SPRITE_HEIGHT, this.x, this.y, this.width, this.height);
             this.game_frame += 10;
         }
     }
+
     class Enemy {
         constructor(gameWidth, gameHeight) {
             this.gameWidth = gameWidth;
@@ -155,18 +228,37 @@ window.addEventListener('load', function () {
             this.frameInterval = 1000 / this.fps;
             this.speed = Math.random() * 2 + 1
             this.isMarkedForDeletion = false
+            this.enemy_health = 50
+
         }
         update(deltaTime) {
-            if (this.frameX >= this.maxFrame) this.frameX = 0
-            else this.frameX++
 
+            if (this.time_since_last_increased_frame >= this.frameInterval) {
+                if (this.frameX >= this.maxFrame) this.frameX = 0
+                else this.frameX++
+                this.time_since_last_increased_frame = 0
+            } else {
+                this.time_since_last_increased_frame += deltaTime
+            }
+
+
+            new Player(this.gameWidth, this.gameHeight, this.x, this.y)
 
             if (this.x < 0 - this.width) {
                 this.isMarkedForDeletion = true;
             }
             this.x -= this.speed
         }
+        show_Health() {
+            ctx.font = "20px Arial"
+            ctx.fillStyle = 'black'
+            ctx.fillText(this.enemy_health, this.width, this.x * 1.5, this.y * 1.5)
+        }
+
         draw(context) {
+            context.beginPath()
+            context.arc(this.x + this.width / 2, this.y + this.height / 2, this.width / 2, 0, Math.PI * 2)
+            context.stroke()
             if (this.enemy) {
                 context.drawImage(
                     this.enemy,
@@ -187,16 +279,19 @@ window.addEventListener('load', function () {
     let background_layer_2 = background1
     let background_layer_3 = background2;
 
+
     let layer_1 = new Layer(background_layer_1, 1, canvas.width, canvas.height)
     let layer_2 = new Layer(background_layer_2, 1.5, canvas.width, canvas.height)
     let layer_3 = new Layer(background_layer_3, 2, canvas.width, canvas.height)
+
+
 
     const Game_Layers = [layer_1, layer_2, layer_3]
     const player = new Player(CANVAS_WIDTH, CANVAS_HEIGHT);
 
 
     let i_spawn_enemies = 0
-    let some_extra_delay = 10000
+    let some_extra_delay = 2000
     let i_create_random_stall_before_creating_a_new_enemy = Math.random() * 2000 + 500
 
 
@@ -224,12 +319,15 @@ window.addEventListener('load', function () {
             layer.update()
             layer.draw()
         })
-
+        layer_4.show_update(deltaTime)
         handleEnemies(deltaTime)
-        player.update();
+        player.update(enemies);
         player.draw(ctx);
+        player.show_Health()
 
-        requestAnimationFrame(animate);
+
+
+        if (!game_over) requestAnimationFrame(animate);
     };
     animate(0);
 });

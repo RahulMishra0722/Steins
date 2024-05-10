@@ -1,28 +1,46 @@
 export class InputHandler {
     constructor() {
         this.inputs = [];
-        this.timer = 0;
-
         document.addEventListener('keydown', (e) => {
-            if (e.code === "KeyE") {
-                this.timer = 1
-            }
-
             if (!this.inputs.includes(e.code)) {
-                if (e.code === "KeyW" || e.code === 'KeyS' || e.code === 'KeyA' || e.code === 'KeyD' || e.code === "KeyE" || e.code === "KeyY" || e.code === "KeyG") {
+                if (e.code === "KeyW" || e.code === 'KeyS' || e.code === 'KeyA' || e.code === 'KeyD' || e.code === "KeyE" || e.code === "KeyY" || e.code === "KeyG" || e.code === "KeyT") {
                     this.inputs.push(e.code);
                 }
             }
         });
 
         document.addEventListener('keyup', (e) => {
-
+            const digit_index = this.inputs.indexOf("Digit1")
+            if (digit_index !== -1) {
+                this.inputs.splice(digit_index, 1)
+            }
             const index = this.inputs.indexOf(e.code);
             if (index !== -1) {
                 this.inputs.splice(index, 1);
 
             }
         });
+    }
+    dead() {
+        if (this.inputs.indexOf("Digit1") === -1) {
+            this.inputs.push("Digit1")
+        }
+    }
+    isDead() {
+        if (this.inputs.includes("Digit1")) {
+            return true
+        } else {
+            return false
+        }
+    }
+
+    is_Attacking() {
+        if (this.inputs.includes("KeyT")) {
+            console.log('yo')
+            return true
+        } else {
+            return false
+        }
     }
 
     i_just_wait() {
@@ -62,12 +80,7 @@ export class InputHandler {
         }
         return false
     }
-    isDead() {
-        if (this.inputs.includes("KeyY")) {
-            return true
-        }
-        return false
-    }
+
     isSittingDown() {
         if (this.inputs.includes("KeyS")) {
             return true

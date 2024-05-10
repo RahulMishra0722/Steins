@@ -24,7 +24,6 @@ class ENEMY {
         this.frames = 0;
         this.flap_speed = Math.floor(Math.random() * 3 + 1);
         this.interval = Math.floor(Math.random() * 200 + 50)
-
     }
     update() {
         //this.x -= this.speed
