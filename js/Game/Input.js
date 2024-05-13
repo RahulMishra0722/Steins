@@ -11,6 +11,7 @@ export class InputHandler {
 
         document.addEventListener('keyup', (e) => {
             const digit_index = this.inputs.indexOf("Digit1")
+
             if (digit_index !== -1) {
                 this.inputs.splice(digit_index, 1)
             }
@@ -36,7 +37,8 @@ export class InputHandler {
 
     is_Attacking() {
         if (this.inputs.includes("KeyT")) {
-            console.log('yo')
+
+
             return true
         } else {
             return false
@@ -61,16 +63,27 @@ export class InputHandler {
             return false;
         }
     }
-    is_moving_backwords() {
-        if (this.inputs.includes('KeyA')) {
+    were_a_and_d_clicked() {
+        if (this.inputs.indexOf("KeyA") !== -1 && this.inputs.indexOf("KeyD") !== -1) {
             return true
-        } else {
-            return false
         }
+        return false
+    }
+    is_moving_backwords() {
+        if (!this.were_a_and_d_clicked() && !this.isRunning()) {
+            if (this.inputs.includes('KeyA')) {
+
+
+                return true;
+            }
+        }
+        return false
     }
     jump_in_position() {
-        if (this.inputs.includes("KeyW")) {
-            return true
+        if (!this.is_moving_backwords()) {
+            if (this.inputs.includes("KeyW")) {
+                return true
+            }
         }
         return false
     }
@@ -90,14 +103,21 @@ export class InputHandler {
     }
 
     ifForwardRollPressed() {
-        if (this.inputs.includes("KeyE")) {
-            return true
+        if (!this.is_moving_backwords()) {
+            if (!this.were_a_and_d_clicked()) {
+                if (this.inputs.includes("KeyE")) {
+                    return true
+                }
+            }
         }
+
         return false
 
     }
-    isRunning(key) {
+
+    isRunning() {
         if (this.inputs.includes("KeyD")) {
+            this.wasD_Clicked = 1
             return true
         }
         return false

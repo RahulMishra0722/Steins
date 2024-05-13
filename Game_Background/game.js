@@ -12,8 +12,8 @@ window.addEventListener('load', function () {
     let shop_ani = shop_animation
 
     let val = 0
-    let distanceTraveled = 0;
-    console.log(distanceTraveled)
+
+
     let layer_4 = new Layer(shop_ani, 1, canvas.width, canvas.height)
 
 
@@ -93,17 +93,16 @@ window.addEventListener('load', function () {
             } else {
                 if (input.isRunning() || input.ifForwardRollPressed()) {
                     val++
+
                 }
             }
 
             layer_4.draw_shop(val)
-
-
-
-
-
-
+            layer_4.draw_lamp(val)
+            layer_4.update0()
             //*Colition Detection
+
+
             enemyArray.forEach(obj => {
                 let dx = obj.x - this.x
                 let dy = obj.y - this.y
@@ -114,23 +113,27 @@ window.addEventListener('load', function () {
                         input.dead()
                         if (input.isDead()) {
                             player_state = "dies"
+                            this.game_over()
                         }
-                        this.player_health = 100
+                        this.player_health = 0
                     }
 
 
                 } if (distance < obj.width / 2 + this.width / 2 && input.is_Attacking()) {
-                    obj.enemy_health -= 10
-
-
+                    obj.enemy_health -= 7
                 }
                 if (obj.enemy_health < 0) {
                     obj.isMarkedForDeletion = true
                 }
             })
+
+
             //* Controls
             if (input.isPlayerIdle()) {
                 player_state = "idle";
+            }
+            if (input.is_moving_backwords() && !input.isRunning()) {
+                player_state = "run_and_jump"
             }
 
 
@@ -149,11 +152,11 @@ window.addEventListener('load', function () {
                 player_state = "attack"
             }
 
-            if (input.jump_in_position() && this.onGround()) {
+            if (input.jump_in_position() && !input.is_moving_backwords() && this.onGround()) {
                 this.vY -= 20
             }
             // Check if the player is currently rolling and limit the height
-            if (input.ifForwardRollPressed() && this.onGround()) {
+            if (input.ifForwardRollPressed() && !input.is_moving_backwords() && this.onGround()) {
                 player_state = 'roll';
                 this.vX += 5
                 this.vY -= 20
@@ -175,20 +178,29 @@ window.addEventListener('load', function () {
             if (this.x < 0) this.x = 0
             else if (this.x > this.gameWidth - this.width) this.x = this.gameWidth - this.width
             if (this.y > this.gameHeight - this.height) this.y = this.gameHeight - this.height
-            if (input.isRunning("KeyD")) {
+            if (input.isRunning() && !input.is_moving_backwords() && !input.is_Attacking()) {
                 this.vX += 2
-                player_state = "run_and_jump";
-            } if (input.is_moving_backwords()) {
+                player_state = "run";
+            } else if (input.is_Attacking()) {
+                player_state = "attack";
+            } if (input.is_moving_backwords() && !input.isRunning()) {
                 this.vX -= 10
             }
             if (input.wasHit()) {
                 player_state = "got_hit";
             }
         }
+        game_over() {
+            ctx.font = '100px Ariel'
+            ctx.fillStyle = "red"
+            ctx.fillText("Game Over", 200, 350)
+            ctx.font = '100px Ariel'
+            ctx.fillStyle = "black"
+            ctx.fillText("Game Over", 202, 350)
+        }
         onGround() {
             return this.y >= this.gameHeight - this.height
         }
-
 
         show_Health() {
             ctx.font = '30px Arial'
@@ -296,19 +308,21 @@ window.addEventListener('load', function () {
 
 
     const handleEnemies = (deltaTime) => {
-        if (i_spawn_enemies > i_create_random_stall_before_creating_a_new_enemy + some_extra_delay) {
-            enemies.push(new Enemy(CANVAS_WIDTH, CANVAS_HEIGHT))
-            console.log(enemies)
-            i_spawn_enemies = 0
-        } else {
-            i_spawn_enemies += deltaTime
-        }
-        enemies = enemies.filter((obj) => !obj.isMarkedForDeletion)
-        enemies.forEach((enemy) => {
-            enemy.draw(ctx)
-            enemy.update(deltaTime)
+        if (val > 1000) {
+            if (i_spawn_enemies > i_create_random_stall_before_creating_a_new_enemy + some_extra_delay) {
+                enemies.push(new Enemy(CANVAS_WIDTH, CANVAS_HEIGHT))
 
-        })
+                i_spawn_enemies = 0
+            } else {
+                i_spawn_enemies += deltaTime
+            }
+            enemies = enemies.filter((obj) => !obj.isMarkedForDeletion)
+            enemies.forEach((enemy) => {
+                enemy.draw(ctx)
+                enemy.update(deltaTime)
+
+            })
+        }
     }
     const animate = (timestamp) => {
         let deltaTime = timestamp - lastTime

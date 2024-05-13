@@ -17,6 +17,7 @@ export class Layer {
         this.current_frame = 0
         this.maxFrame = 5
         this.frame = 0
+        this.frame1 = 0
         this.abc = 0
     }
     update() {
@@ -25,25 +26,32 @@ export class Layer {
             this.x = 0;
         }
     }
-
+    update0() {
+        if (this.x >= this.canvas_width) {
+            this.x = -this.canvas_width;
+        } else {
+            this.x += this.background_speed;
+        }
+    }
     draw() {
-        if (input.ifForwardRollPressed() || input.isRunning() || input.jump_in_position() || input.is_moving_backwords()) {
+        if (input.ifForwardRollPressed() || input.isRunning()) {
             this.background_speed = this.backSppedSaver;
             this.backgroundCanvasctx.drawImage(this.image, this.x, this.y, this.canvas_width, this.canvas_height);
             this.backgroundCanvasctx.drawImage(this.image, this.x + this.canvas_width - this.background_speed, this.y, this.canvas_width, this.canvas_height);
-        } else if (input.isPlayerIdle() || input.isSittingDown() || input.is_Attacking()) {
+        } else if (input.isPlayerIdle() || input.isSittingDown() || input.is_Attacking() || input.jump_in_position()) {
             this.background_speed = 0
             this.backgroundCanvasctx.drawImage(this.image, this.x, this.y, this.canvas_width, this.canvas_height);
             this.backgroundCanvasctx.drawImage(this.image, this.x + this.canvas_width - this.background_speed, this.y, this.canvas_width, this.canvas_height);
         } else if (input.is_moving_backwords()) {
-
+            this.background_speed = this.backSppedSaver;
+            //* It says what direction does animation statts  this.image, -this.x, this.y, this.canvas_width, this.canvas_height
+            this.backgroundCanvasctx.drawImage(this.image, -this.x, this.y, this.canvas_width, this.canvas_height);
+            //* AFTER THE FIRST ENDS DRAW THIS RIGHT AFTER
+            this.backgroundCanvasctx.drawImage(this.image, -this.x - this.canvas_width + this.background_speed, this.y, this.canvas_width, this.canvas_height);
         }
     }
 
-
-
     show_update(deltaTime) {
-
         if (this.current_frame >= this.frameInterval) {
             if (this.frame >= this.maxFrame) this.frame = 0
             else this.frame++
@@ -52,14 +60,14 @@ export class Layer {
         }
     }
     draw_shop(distanceTraveled) {
-        console.log(distanceTraveled)
+
         let shop_ani = shop_animation
         const Sprite_Width = 118
         const Sprite_Height = 128
         const width = Sprite_Width * 2
         const height = Sprite_Height * 2
 
-        const slideSpeed = 1; // Adjust this value to control the speed of sliding
+        const slideSpeed = 2; // Adjust this value to control the speed of sliding
 
         // Calculate the x-coordinate based on distance traveled
         const slideOffset = distanceTraveled * slideSpeed;
@@ -89,6 +97,53 @@ export class Layer {
                 shop_ani,
                 this.frame * Sprite_Width + width, // Adjusted x-coordinate for the remaining part
                 this.x,
+                Sprite_Width - remainingSlide, // Adjusted width for the remaining part
+                Sprite_Height,
+                0,
+                this.canvas_height - height,
+                width - remainingSlide, // Adjusted width for the remaining part
+                height
+            );
+        }
+    }
+    draw_lamp(distanceTraveled) {
+
+        let shop_ani = lamp
+        const Sprite_Width = 23
+        const Sprite_Height = 57
+        const width = Sprite_Width * 2
+        const height = Sprite_Height * 2
+
+        const slideSpeed = 2; // Adjust this value to control the speed of sliding
+
+        // Calculate the x-coordinate based on distance traveled
+        const slideOffset = distanceTraveled * slideSpeed;
+
+        // Calculate the position where the image starts to disappear
+        const slideDisappearPosition = this.canvas_width - width;
+
+        // Draw the image if it's still visible on the canvas
+        if (this.canvas_width - slideOffset > 0) {
+            // Draw the image with the adjusted x-coordinate
+            this.backgroundCanvasctx.drawImage(
+                shop_ani,
+                this.frame1 * Sprite_Width,
+                0,
+                Sprite_Width,
+                Sprite_Height,
+                this.canvas_width - width - slideOffset, // Adjusted x-coordinate for sliding
+                this.canvas_height - height,
+                width,
+                height
+            );
+        } else if (slideOffset > slideDisappearPosition) {
+            // If the image has slid beyond the canvas width, but not completely disappeared
+            const remainingSlide = slideOffset - slideDisappearPosition;
+            // Draw the remaining part of the image within the canvas
+            this.backgroundCanvasctx.drawImage(
+                shop_ani,
+                this.frame1 * Sprite_Width + width, // Adjusted x-coordinate for the remaining part
+                0,
                 Sprite_Width - remainingSlide, // Adjusted width for the remaining part
                 Sprite_Height,
                 0,
